@@ -8,8 +8,6 @@ import javax.swing.table.TableModel;
 import java_ui.prolog_loader.CPrefRulesPrologLoader;
 import java_ui.prolog_loader.CriteriaPrologLoader;
 import java_ui.prolog_loader.EvidencePrologLoader;
-import java_ui.prolog_loader.FeaturesPrologLoader;
-import java_ui.prolog_loader.ProfileRulesPrologLoader;
 import java_ui.steps.DefineCprefRulesStepPanel;
 import java_ui.steps.DefineEvidenceStepPanel;
 import java_ui.steps.DefineStepPanel;
@@ -22,8 +20,6 @@ import java_ui.table_editor.model_builder.EvidenceTableModelBuilder;
 import java_ui.table_editor.panel.CPrefRulesTableEditorPanel;
 import java_ui.table_editor.panel.CriteriaTableEditorPanel;
 import java_ui.table_editor.panel.EvidenceTableEditorPanel;
-import java_ui.table_editor.panel.FeaturesTableEditorPanel;
-import java_ui.table_editor.panel.ProfileRulesTableEditorPanel;
 import java_ui.table_editor.table_reader.CSVTableReader;
 
 import java.awt.GridBagLayout;
@@ -62,10 +58,10 @@ public class AllStepsPanel extends JPanel{
 		
 		
 		step_1 = new DefineStepPanel(
-				"1. Define the set of features and their domain.",
-				"Features",
-				new FeaturesTableEditorPanel(),
-				new FeaturesPrologLoader()
+				"1. Define the set of criteria.",
+				"Criteria",
+				new CriteriaTableEditorPanel(),
+				new CriteriaPrologLoader()
 		);
 		
 		step_2 = new DefineEvidenceStepPanel(
@@ -75,22 +71,8 @@ public class AllStepsPanel extends JPanel{
 				new EvidencePrologLoader()
 		);
 		
-		step_3 = new DefineStepPanel(
-				"3. Define the set of criteria and their assessment values.",
-				"Criteria",
-				new CriteriaTableEditorPanel(),
-				new CriteriaPrologLoader()
-		);
-		
-		step_4 = new DefineStepPanel(
-				"4. Define the set of Profile-Rules.",
-				"Profile-Rules",
-				new ProfileRulesTableEditorPanel(),
-				new ProfileRulesPrologLoader()
-		);
-		
-		step_5 = new DefineCprefRulesStepPanel(
-				"5. Define the set of CPref-Rules.",
+		step_3 = new DefineCprefRulesStepPanel(
+				"3. Define the set of CPref-Rules.",
 				"CPref-Rules",
 				new CPrefRulesTableEditorPanel(),
 				new CPrefRulesPrologLoader()
@@ -101,13 +83,11 @@ public class AllStepsPanel extends JPanel{
 		
 		step_1.setFollowingStep(step_2);
 		step_2.setFollowingStep(step_3);
-		step_3.setFollowingStep(step_4);
-		step_4.setFollowingStep(step_5);
-		step_5.setFollowingStep(run_step);
+		step_3.setFollowingStep(run_step);
 		
 		step_2.disableStep();
 		
-		StepPanel [] stepsPanels = {step_1, step_2, step_3, step_4, step_5};
+		StepPanel [] stepsPanels = {step_1, step_2, step_3};
 		
 		int i;
 		GridBagConstraints gbc_container;
@@ -139,29 +119,21 @@ public class AllStepsPanel extends JPanel{
 	
 	public void loadExample(int n, String subject) throws IOException{
 		
-		String features_example_path = "features_example.csv";
 		String criteria_example_path = "criteria_example.csv";
 		String evidence_example_path = "evidence_example_"+n+".csv";
-		String profile_rules_example_path = "profile_rules_example.csv";
 		String cpref_rules_example_path = "cpref_rules_example ("+subject+").csv";
 		
-		File features_file = new File(DSJavaUI.getExamplesFolderRelativePath()+"/examples/"+features_example_path);
 		File criteria_file = new File(DSJavaUI.getExamplesFolderRelativePath()+"/examples/"+criteria_example_path);
 		File evidence_file = new File(DSJavaUI.getExamplesFolderRelativePath()+"/examples/"+evidence_example_path);
-		File profile_rules_file = new File(DSJavaUI.getExamplesFolderRelativePath()+"/examples/"+profile_rules_example_path);
 		File cpref_rules_file = new File(DSJavaUI.getExamplesFolderRelativePath()+"/examples/"+cpref_rules_example_path);
 		
-		TableModel featuresModel = new CriteriaTableModelBuilder(new CSVTableReader(features_file)).getTableModel();
 		TableModel criteriaModel = new CriteriaTableModelBuilder(new CSVTableReader(criteria_file)).getTableModel();
 		TableModel evidenceModel = new EvidenceTableModelBuilder(new CSVTableReader(evidence_file)).getTableModel();
 		TableModel cprefRulesModel = new RulesTableModelBuilder(new CSVTableReader(cpref_rules_file)).getTableModel();
-		TableModel profileRulesModel = new RulesTableModelBuilder(new CSVTableReader(profile_rules_file)).getTableModel();
 		
-		((DefineStepPanel) step_1).setTableModel(featuresModel);
-		((DefineEvidenceStepPanel) step_2).setTableModel(evidenceModel);
-		((DefineStepPanel)step_3).setTableModel(criteriaModel);
-		((DefineStepPanel)step_4).setTableModel(profileRulesModel);
-		((DefineStepPanel)step_5).setTableModel(cprefRulesModel);
+		((DefineStepPanel)step_1).setTableModel(criteriaModel);
+		((DefineEvidenceStepPanel) step_2).setTableModel(evidenceModel);		
+		((DefineStepPanel)step_3).setTableModel(cprefRulesModel);
 		
 		
 		run_step.enableStep();
