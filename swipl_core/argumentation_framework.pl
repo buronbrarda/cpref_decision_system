@@ -4,7 +4,7 @@
 		
 		set_comparison_criterion/1,
 		set_rules_order/1,
-		reset_comparison_criterion/0,
+		reset_rules_order/0,
 		
 		rules/3,
 		premises/3,
@@ -15,7 +15,7 @@
 		justification/4
 	]).
 	
-	
+	:-use_module(data_manager, [cpref_rules_order/1]).
 	:-use_module(utils).
 	:-use_module(arg_generator, [argument/4, generate_arguments/0]).
 		
@@ -23,17 +23,6 @@
 	:-dynamic m_dialectical_tree/3.
 	
 	:-dynamic dtree_node/5.
-	
-	:-dynamic comparison_criterion/1.
-	:-dynamic rules_order/1.
-	
-	
-	%Default comparison criterion.
-	
-	reset_comparison_criterion:-
-		retractall(comparison_criterion(_)),
-		assert(comparison_criterion(specificity)),
-		retractall(rules_order(_)).
 	
 	%===================================================================================
 	
@@ -103,32 +92,14 @@
 		
 		Defines whether ArgA is stronger than Argb.
 	************************************************************************************/
-	stronger(ArgA,ArgB):-
-		comparison_criterion(rules_lexicographic),!,
+	stronger(ArgA, ArgB):-
 		rules(RulesA,_,ArgA),
 		rules(RulesB,_,ArgB),
-		member(RA,RulesA),
-		forall(member(RB,RulesB), r_stronger(RA,RB)).
-	
-	stronger(ArgA, ArgB):-
-		comparison_criterion(specificity),!,
-		premises(PremisesA,_,ArgA),
-		premises(PremisesB,_,ArgB),
-		strict_contained(PremisesB,PremisesA).
-	
-	
-	set_comparison_criterion(Criterion):-
-		retractall(comparison_criterion(_)),
-		assert(comparison_criterion(Criterion)).
-	
-	
-	set_rules_order(Order):-
-		retractall(rules_order(_)),
-		assert(rules_order(Order)).
+		r_stronger(RulesA,RulesB).
 	
 	
 	r_stronger(RuleA,RuleB):-
-		rules_order(Order),
+		cpref_rules_order(Order),
 		r_index(N,RuleA,Order),
 		r_index(M,RuleB,Order),
 		N < M.
